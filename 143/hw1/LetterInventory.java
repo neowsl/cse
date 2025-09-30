@@ -144,7 +144,7 @@ public class LetterInventory {
 	 * @param other the other {@code LetterInventory} to add.
 	 * @return a new {@code LetterInventory} representing {@code this + other}.
 	 */
-	LetterInventory add(LetterInventory other) {
+	public LetterInventory add(LetterInventory other) {
 		LetterInventory res = new LetterInventory();
 
 		for (int i = 0; i < CAPACITY; ++i) {
@@ -168,7 +168,7 @@ public class LetterInventory {
 	 * @return a new {@code LetterInventory} representing {@code this - other}, or
 	 *         {@code null} if any resulting count is negative.
 	 */
-	LetterInventory subtract(LetterInventory other) {
+	public LetterInventory subtract(LetterInventory other) {
 		LetterInventory res = new LetterInventory();
 
 		for (int i = 0; i < CAPACITY; ++i) {

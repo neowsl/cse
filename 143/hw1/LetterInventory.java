@@ -1,11 +1,19 @@
 /**
- * Keep track of an inventory of letters in the alphabet.
+ * The {@code LetterInventory} class keeps track of an inventory of alphabetic
+ * letters. It provides methods such as {@code get}, {@code set}, {@code add},
+ * and {@code subtract} to manipulate the internal data. {@code ListInventory}
+ * is designed to manipulate the inventory efficiently and provide easy access
+ * to letter data.
  *
- * @author Neal Wang
+ * @author Neal Wang <nealwang@uw.edu>
+ * @date 2025-09-30
+ * @professor Stuart Reges
+ * @ta XunMei Liu
+ * @section BA
  */
 public class LetterInventory {
 	// a hash map that stores the frequency of each letter
-	private int[] map;
+	private int[] letterMap;
 	// a cached value of the sum of all letter counts in the inventory
 	private int size;
 
@@ -23,17 +31,17 @@ public class LetterInventory {
 	 * @param data the string to initialise the inventory with.
 	 */
 	public LetterInventory(String data) {
-		map = new int[CAPACITY];
+		letterMap = new int[CAPACITY];
 		size = 0;
 
-		for (char letter : data.toCharArray()) {
-			try {
-				map[hash(letter)]++;
+		// ideally would use `data.toCharArray()` + `Iterable`
+		for (int i = 0; i < data.length(); i++) {
+			char letter = data.charAt(i);
+			// ignore non-alphabetic letters
+			if (Character.isAlphabetic(letter)) {
+				letterMap[hash(letter)]++;
 				// `size` isn't necessarily the same as `data.length()` if chars are ignored
 				size++;
-			} catch (IllegalArgumentException e) {
-				// `letter` was not alphabetic; ignore according to spec
-				continue;
 			}
 		}
 	}
@@ -48,7 +56,8 @@ public class LetterInventory {
 	/**
 	 * Gets the count of how many of {@code letter} exist in the inventory.
 	 * 
-	 * @param letter the lowercase or uppercase alphabetic character count.
+	 * @param letter the lowercase or uppercase alphabetic character to get the
+	 *               count of.
 	 * @return the count of how many of {@code letter} exist in the inventory.
 	 * @throws IllegalArgumentException if {@code letter} is nonalphabetic.
 	 */
@@ -57,7 +66,7 @@ public class LetterInventory {
 			throw new IllegalArgumentException("letter must be alphabetic");
 		}
 
-		return map[hash(letter)];
+		return letterMap[hash(letter)];
 	}
 
 	/**
@@ -82,7 +91,7 @@ public class LetterInventory {
 		// then increase `size` by the future count of `letter`
 		size += value;
 
-		map[hash(letter)] = value;
+		letterMap[hash(letter)] = value;
 	}
 
 	/**
@@ -107,61 +116,23 @@ public class LetterInventory {
 	 * be in lowercase, in sorted order, and surrounded by square brackets. The
 	 * number of occurrences of each letter will match its count in the inventory.
 	 *
-	 * @returns the string representation of the inventory.
+	 * @return the string representation of the inventory.
 	 */
 	public String toString() {
-		// use `StringBuilder` to avoid excessive copying
-		StringBuilder sb = new StringBuilder("[");
+		// ideally would use a `StringBuilder`
+		String res = "[";
 
 		for (int i = 0; i < CAPACITY; i++) {
 			// ignore 0-count letters
-			if (map[i] == 0) {
-				continue;
+			if (letterMap[i] >= 0) {
+				char letter = unhash(i);
+				for (int j = 0; j < letterMap[i]; j++) {
+					res += letter;
+				}
 			}
-
-			// convert `letter` to a char, then repeat by the count of `letter`
-			String repeated = Character.toString(unhash(i)).repeat(map[i]);
-			sb.append(repeated);
 		}
 
-		sb.append("]");
-
-		return sb.toString();
-	}
-
-	/**
-	 * Computes the hash of a letter. Uppercase letters will be converted to
-	 * lowercase. The resulting hash value will be between 0 and 25.
-	 * 
-	 * @param letter the lowercase or uppercase alphabetic character to be hashed.
-	 * @return a unique hash value between 0 and 25 based on {@code letter}.
-	 * @throws IllegalArgumentException if {@code letter} is nonalphabetic.
-	 */
-	private int hash(char letter) {
-		if (!Character.isAlphabetic(letter)) {
-			throw new IllegalArgumentException("letter must be alphabetic");
-		}
-
-		return Character.toLowerCase(letter) - 'a';
-	}
-
-	/**
-	 * Computes the letter from a hash. This is an inverse function of {@code hash}.
-	 * I.e. given a lowercase letter {@code letter},
-	 * {@code unhash(hash(letter)) = letter}.
-	 * 
-	 * @param hashed the hashed value to unhash.
-	 * @return the unhashed value of {@code hashed}.
-	 * @throws IllegalArgumentException if {@code hashed} is < 0 or > 25.
-	 */
-	private char unhash(int hashed) {
-		// used `25` instead of `CAPACITY` because unhash should work on any character,
-		// regardless of `CAPACITY`
-		if (hashed < 0 || hashed > 25) {
-			throw new IllegalArgumentException("hashed must be between 0 and 25");
-		}
-
-		return (char) (hashed + 'a');
+		return res + "]";
 	}
 
 	/**
@@ -206,6 +177,7 @@ public class LetterInventory {
 
 			int count = get(letter) - other.get(letter);
 			if (count < 0) {
+				// return `null` if count is negative
 				return null;
 			}
 
@@ -213,5 +185,42 @@ public class LetterInventory {
 		}
 
 		return res;
+	}
+
+	/**
+	 * Computes the hash of a letter. Uppercase letters will be converted to
+	 * lowercase. The resulting hash value will be between 0 and 25.
+	 * 
+	 * @param letter the lowercase or uppercase alphabetic character to be hashed.
+	 * @return a unique hash value between 0 and 25 based on {@code letter}.
+	 * @throws IllegalArgumentException if {@code letter} is nonalphabetic.
+	 */
+	private int hash(char letter) {
+		if (!Character.isAlphabetic(letter)) {
+			throw new IllegalArgumentException("letter must be alphabetic");
+		}
+
+		return Character.toLowerCase(letter) - 'a';
+	}
+
+	/**
+	 * Computes the letter from a hash. This is an inverse function of {@code hash}.
+	 * <p>
+	 * I.e. given a lowercase letter {@code letter},
+	 * {@code unhash(hash(letter)) = letter}.
+	 * 
+	 * @param hashed the hashed value to unhash.
+	 * @return the unhashed value of {@code hashed}.
+	 * @throws IllegalArgumentException if {@code hashed} is < 0 or > 25.
+	 */
+	private char unhash(int hashed) {
+		int alphabetSize = 26;
+		// use `alphabetSize` instead of `CAPACITY` because unhash should work on any
+		// character, regardless of `CAPACITY`
+		if (hashed < 0 || hashed >= alphabetSize) {
+			throw new IllegalArgumentException("hashed must be between 0 and 25");
+		}
+
+		return (char) (hashed + 'a');
 	}
 }

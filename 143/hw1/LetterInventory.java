@@ -20,7 +20,7 @@ public class LetterInventory {
 	/*
 	 * The number of unique letters to store counts for.
 	 */
-	public static final int CAPACITY = 26;
+	public static final int ALPHABET_LENGTH = 26;
 
 	/**
 	 * Constructs a new {@code LetterInventory} from the given string.
@@ -31,7 +31,7 @@ public class LetterInventory {
 	 * @param data the string to initialise the inventory with.
 	 */
 	public LetterInventory(String data) {
-		letterMap = new int[CAPACITY];
+		letterMap = new int[ALPHABET_LENGTH];
 		size = 0;
 
 		// ideally would use `data.toCharArray()` + `Iterable`
@@ -122,7 +122,7 @@ public class LetterInventory {
 		// ideally would use a `StringBuilder`
 		String res = "[";
 
-		for (int i = 0; i < CAPACITY; i++) {
+		for (int i = 0; i < ALPHABET_LENGTH; i++) {
 			// ignore 0-count letters
 			if (letterMap[i] >= 0) {
 				char letter = unhash(i);
@@ -147,7 +147,7 @@ public class LetterInventory {
 	public LetterInventory add(LetterInventory other) {
 		LetterInventory res = new LetterInventory();
 
-		for (int i = 0; i < CAPACITY; ++i) {
+		for (int i = 0; i < ALPHABET_LENGTH; ++i) {
 			// convert `i` back to a `char`
 			char letter = unhash(i);
 			res.set(letter, get(letter) + other.get(letter));
@@ -171,7 +171,7 @@ public class LetterInventory {
 	public LetterInventory subtract(LetterInventory other) {
 		LetterInventory res = new LetterInventory();
 
-		for (int i = 0; i < CAPACITY; ++i) {
+		for (int i = 0; i < ALPHABET_LENGTH; ++i) {
 			// convert `i` back to a `char`
 			char letter = unhash(i);
 
@@ -214,10 +214,7 @@ public class LetterInventory {
 	 * @throws IllegalArgumentException if {@code hashed} is < 0 or > 25.
 	 */
 	private char unhash(int hashed) {
-		int alphabetSize = 26;
-		// use `alphabetSize` instead of `CAPACITY` because unhash should work on any
-		// character, regardless of `CAPACITY`
-		if (hashed < 0 || hashed >= alphabetSize) {
+		if (hashed < 0 || hashed >= ALPHABET_LENGTH) {
 			throw new IllegalArgumentException("hashed must be between 0 and 25");
 		}
 

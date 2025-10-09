@@ -49,7 +49,7 @@ public class GuitarString {
 		}
 
 		// N = length of ringBuffer
-		long N = Math.round((double) StdAudio.SAMPLE_RATE / frequency);
+		int N = (int) Math.round(StdAudio.SAMPLE_RATE / frequency);
 		if (N < 2) {
 			// N can't be < 2 since Karpus-Strong requires at least 2 values
 			throw new IllegalArgumentException("ring buffer too small");

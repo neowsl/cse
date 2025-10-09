@@ -96,6 +96,8 @@ public class LetterInventory {
 
 	/**
 	 * Gets the sum of all letter counts in the inventory
+	 *
+	 * @return the sum of all letter counts in the inventory.
 	 */
 	public int size() {
 		return size;

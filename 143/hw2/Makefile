@@ -1,9 +1,8 @@
 build:
-	# javac TestString.java
-	# javac GuitarHero.java
-	javac PlayThatTune.java
+	cp Guitar37.java test37
+	javac TestString.java
+	cd test37 && javac Test37.java
 
 exec:
-	# java TestString
-	# java GuitarHero
-	java PlayThatTune
+	java TestString
+	cd test37 && java Test37

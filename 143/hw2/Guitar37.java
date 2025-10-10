@@ -14,9 +14,9 @@
  */
 public class Guitar37 implements Guitar {
 	/**
-	 * A keyboard-to-string map, where the {@code i}th character corresponds to the
-	 * {@code i}th string. Note that concert A will be centered at
-	 * {@code i = CONCERT_A_INDEX}.
+	 * A mapping between computer keyboard keys and corresponding guitar strings,
+	 * where the {@code i}th character corresponds to the {@code i}th string. Note
+	 * that concert A will be centered at {@code i = CONCERT_A_INDEX}.
 	 */
 	public static final String KEYBOARD = "q2we4r5ty7u8i9op-[=zxdcfvgbnjmk,.;/' ";
 	/**
@@ -28,14 +28,20 @@ public class Guitar37 implements Guitar {
 	 */
 	public static final int CONCERT_A_INDEX = 24;
 
-	private GuitarString[] strings;
-	// the time in ticks (i.e. the number of times `tic()` has been called)
+	/**
+	 * The guitar's strings in an ascending scale, where concert A is at
+	 * {@link #CONCERT_A_INDEX}.
+	 */
+	private final GuitarString[] strings;
+	/**
+	 * The time in ticks (i.e. the number of times `tic()` has been called).
+	 */
 	private int time = 0;
 
 	/**
-	 * Constructs a new {@link Guitar37} with 37 strings. Initializes the strings in
-	 * an ascending scale, with concert A centered at index
-	 * {@link #CONCERT_A_INDEX}.
+	 * Constructs a new {@link Guitar37} with 37 strings, with frequencies ranging
+	 * from 110Hz to 880Hz. Initializes the strings in an ascending chromatic scale,
+	 * with concert A at index {@link #CONCERT_A_INDEX}.
 	 */
 	public Guitar37() {
 		strings = new GuitarString[NUM_STRINGS];
@@ -46,12 +52,11 @@ public class Guitar37 implements Guitar {
 	}
 
 	/**
-	 * Plucks the string with pitch {@code pitch}.
+	 * Plucks the string with pitch {@code pitch}. If {@code pitch} does not
+	 * correspond to a valid string, no string is plucked.
 	 *
 	 * @param pitch the pitch of the string to pluck, where {@code pitch = 0}
 	 *              corresponds to concert A. Negative values are acceptable.
-	 * @apiNote If {@code pitch} does not correspond with a string on the guitar, no
-	 *          string is plucked.
 	 * @see GuitarString#pluck()
 	 */
 	public void playNote(int pitch) {
@@ -78,7 +83,7 @@ public class Guitar37 implements Guitar {
 	 *
 	 * @param key the key corresponding to the string to pluck.
 	 * @throws IllegalArgumentException if {@code key} does not correspond to a
-	 *                                  string.
+	 *                                  valid string.
 	 * @see GuitarString#pluck()
 	 */
 	public void pluck(char key) {

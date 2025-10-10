@@ -13,10 +13,6 @@ import java.util.*;
  * @section BA
  */
 public class GuitarString {
-	// a ring buffer of size `StdAudio.SAMPLE_RATE / frequency` that stores the
-	// displacement of the string at equal intervals of time
-	private Queue<Double> ringBuffer;
-
 	/**
 	 * The minimum displacement when exciting the string.
 	 */
@@ -26,9 +22,18 @@ public class GuitarString {
 	 */
 	public static final double MAX_DISPLACEMENT = 0.5;
 	/**
-	 * The energy dissipation multiplier as the wave traverses the string.
+	 * The energy dissipation multiplier per tick.
 	 */
 	public static final double ENERGY_DECAY_FACTOR = 0.996;
+
+	/**
+	 * A ring buffer of size {@link StdAudio#SAMPLE_RATE} divided by
+	 * {@code frequency}, rounded to the nearest integer.
+	 * <p>
+	 * Each element represents the displacement of the string at equal intervals of
+	 * time.
+	 */
+	private Queue<Double> ringBuffer;
 
 	/**
 	 * Constructs a new {@link GuitarString} with frequency {@code frequency}.
@@ -102,7 +107,8 @@ public class GuitarString {
 	}
 
 	/**
-	 * Applies the Karplus-Strong algorithm once using {@link #ENERGY_DECAY_FACTOR}.
+	 * Advances the simulation forward by one step by applying the Karplus-Strong
+	 * algorithm once using {@link #ENERGY_DECAY_FACTOR}.
 	 * <p>
 	 * Ensures that the size of the ring buffer remains constant, and that the last
 	 * element is the average of the first two elements of the ring buffer

@@ -74,6 +74,8 @@ public class HangmanManager {
 
 	/**
 	 * Gets the current set of words being considered by the hangman manager.
+	 * <p>
+	 * Note that an internal reference is returned, not a defensive copy.
 	 *
 	 * @return the current set of words being considered.
 	 */
@@ -93,6 +95,8 @@ public class HangmanManager {
 
 	/**
 	 * Gets the current set of letters that have been guessed by the player.
+	 * <p>
+	 * Note that an internal reference is returned, not a defensive copy.
 	 *
 	 * @return the current set of letters that have been guessed.
 	 */
@@ -123,8 +127,12 @@ public class HangmanManager {
 	}
 
 	/**
-	 * Records a player's guess. Selects the optimal set of words to proceed with.
-	 * Gets the number of occurrences of {@code guess} in the new optimal pattern.
+	 * Records a player's guess, selecting the pattern of the optimal set of words
+	 * (the largest word family) to proceed with and returning the number of
+	 * occurrences of {@code guess} in the new optimal pattern.
+	 * <p>
+	 * In the event of a tie in the word family sizes, the alphabetically-first
+	 * pattern is used.
 	 * <p>
 	 * Ensures:
 	 * <ul>
@@ -202,6 +210,9 @@ public class HangmanManager {
 	/**
 	 * Finds the pattern containing the most words, given a map of patterns to word
 	 * families {@code families}.
+	 * <p>
+	 * In the event of a tie in the word family sizes, the alphabetically-first
+	 * pattern is returned.
 	 *
 	 * @param families a map of patterns to word families (hint: can be generated
 	 *                 using {@link #makeFamilies()}).

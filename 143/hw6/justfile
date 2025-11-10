@@ -1,0 +1,5 @@
+build:
+	javac AnagramMain.java
+
+exec:
+	@java AnagramMain

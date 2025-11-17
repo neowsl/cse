@@ -1,0 +1,5 @@
+build:
+	javac QuestionMain.java
+
+exec:
+	java QuestionMain

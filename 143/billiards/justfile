@@ -1,0 +1,5 @@
+build:
+	javac BilliardsTester.java
+
+exec:
+	java -ea BilliardsTester

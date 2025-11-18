@@ -1,10 +1,15 @@
 import java.util.List;
+import java.util.ArrayList;
 
 public class BilliardBallSet implements Comparable<BilliardBallSet> {
 	private List<BilliardBall> balls;
 
 	public BilliardBallSet(List<BilliardBall> list) {
 		this.balls = list;
+	}
+
+	public BilliardBallSet() {
+		this.balls = new ArrayList<>();
 	}
 
 	public BilliardBallSet(BilliardBall ball) {
@@ -25,6 +30,10 @@ public class BilliardBallSet implements Comparable<BilliardBallSet> {
 
 	public BilliardBall getBall(int index) {
 		return balls.get(index);
+	}
+
+	public void add(BilliardBall ball) {
+		this.balls.add(ball);
 	}
 
 	private int weight() {

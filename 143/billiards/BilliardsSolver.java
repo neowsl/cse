@@ -2,6 +2,59 @@ import java.util.List;
 import java.util.ArrayList;
 
 public class BilliardsSolver {
+	public static BilliardBall solve12_3(BilliardBallSet balls) {
+		BilliardBallSet s1 = new BilliardBallSet(balls.getBalls(0, 4));
+		BilliardBallSet s2 = new BilliardBallSet(balls.getBalls(4, 8));
+		BilliardBallSet s3 = new BilliardBallSet(balls.getBalls(8, balls.size()));
+
+		int c1 = s1.compareTo(s2);
+		if (c1 == 0) {
+			// fake must be in other 4
+			return solve4_2(s3);
+		}
+
+		// make `s1` the lighter set
+		if (c1 > 0) {
+			BilliardBallSet tmp = s1;
+			s1 = s2;
+			s2 = tmp;
+		}
+
+		BilliardBallSet s4 = new BilliardBallSet();
+		s4.add(s2.getBall(0));
+		s4.add(s1.getBall(1));
+		s4.add(s3.getBall(0));
+		BilliardBallSet s5 = new BilliardBallSet();
+		s5.add(s1.getBall(0));
+		s5.add(s2.getBall(1));
+		s5.add(s2.getBall(2));
+
+		int c2 = s4.compareTo(s5);
+		if (c2 > 0) {
+			BilliardBallSet s6 = new BilliardBallSet(s1.getBall(0));
+			BilliardBallSet s7 = new BilliardBallSet(s3.getBall(0));
+			if (s6.compareTo(s7) == 0)
+				return s2.getBall(0);
+			return s1.getBall(0);
+		}
+
+		if (c2 == 0) {
+			// removed balls
+			BilliardBallSet s6 = new BilliardBallSet();
+			s6.add(s1.getBall(2));
+			s6.add(s1.getBall(3));
+			s6.add(s2.getBall(3));
+			return solve3_1(s6, -1);
+		}
+
+		// kept balls
+		BilliardBallSet s6 = new BilliardBallSet();
+		s6.add(s2.getBall(1));
+		s6.add(s2.getBall(2));
+		s6.add(s1.getBall(1));
+		return solve3_1(s6, 1);
+	}
+
 	public static BilliardBall solve10_3(BilliardBallSet balls) {
 		BilliardBallSet s1 = new BilliardBallSet(balls.getBalls(0, 3));
 		BilliardBallSet s2 = new BilliardBallSet(balls.getBalls(3, 6));

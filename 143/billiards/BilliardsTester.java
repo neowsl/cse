@@ -3,15 +3,16 @@ import java.util.List;
 import java.util.ArrayList;
 
 public class BilliardsTester {
-	public static int NUM_BALLS = 10;
+	public static int NUM_BALLS = 12;
 
 	public static void main(String[] args) {
 		Random r = new Random();
 
 		for (int i = 0; i < NUM_BALLS; i++) {
-			Globals.resetWeighings();
+			// make fake ball at index `i`
+			System.out.println("Testing i = " + i);
 
-			// make fake ball `i`
+			Globals.resetWeighings();
 
 			int fakeWeight, realWeight;
 			do {
@@ -25,7 +26,7 @@ public class BilliardsTester {
 			}
 			BilliardBallSet balls = new BilliardBallSet(l);
 
-			BilliardBall fake = BilliardsSolver.solve10_3(balls);
+			BilliardBall fake = BilliardsSolver.solve12_3(balls);
 			assert fake.getWeight() == fakeWeight : "Incorrect solution";
 		}
 

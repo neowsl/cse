@@ -22,7 +22,11 @@ public class USCurrency implements Comparable<USCurrency> {
 		if (cents < 0) {
 			res += "-";
 		}
-		res += "$" + Math.abs(dollars()) + "." + cents();
+		String centsStr = "" + Math.abs(cents);
+		if (centsStr.length() == 1) {
+			centsStr = "0" + centsStr;
+		}
+		res += "$" + Math.abs(dollars()) + "." + centsStr;
 		return res;
 	}
 

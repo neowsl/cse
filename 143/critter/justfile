@@ -1,0 +1,7 @@
+train:
+	@javac OrcaTrainer2.java
+	java OrcaTrainer2
+
+simulate:
+	@javac CritterMain.java
+	java CritterMain

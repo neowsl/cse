@@ -67,9 +67,9 @@ public class AnagramSolver {
 		}
 
 		// if `max` = 0, then we can use unlimited words (i.e. the size of the
-		// entire inventory)
+		// reference)
 		print(reference, prunedDictionary, new Stack<>(),
-				max > 0 ? max : inventories.size());
+				max > 0 ? max : reference.size());
 	}
 
 	/**

@@ -1,0 +1,3 @@
+makecode:
+	@javac MakeCode.java
+	@java MakeCode

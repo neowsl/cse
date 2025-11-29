@@ -2,6 +2,11 @@ import java.util.*;
 import java.io.*;
 
 /**
+ * The {@link QuestionTree} class allows the user to play a guessing game based
+ * on yes/no questions, where the program attempts to guess an object the user
+ * is thinking of. The class provides methods to read and write its data to a
+ * file. The {@link QuestionTree} grows as users describe new objects to insert
+ * into the tree.
  *
  * @author Neal Wang <nealwang@uw.edu>
  * @assignment 7

@@ -1,3 +1,6 @@
+build:
+	@javac Decode.java
+
 makecode:
 	@javac MakeCode.java
 	@java MakeCode

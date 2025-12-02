@@ -38,6 +38,54 @@ public class HuffmanTree2 {
 	}
 
 	/**
+	 * Reconstructs a {@link HuffmanTree2} given a {@link Scanner}.
+	 * <p>
+	 * Requires that the input tree is in standard format. I.e., each line
+	 * contains a integer symbol code, followed by a line containing that
+	 * symbol's path in the tree.
+	 *
+	 * @param input A {@link Scanner} that contains a tree stored in standard
+	 *              format.
+	 */
+	public HuffmanTree2(Scanner input) {
+		while (input.hasNext()) {
+			int symbol = Integer.parseInt(input.nextLine());
+			String code = input.nextLine();
+
+			overallRoot = construct(overallRoot, symbol, code, 0);
+		}
+	}
+
+	/**
+	 * Recursive helper method for {@link #HuffmanTree(Scanner)}. Inserts a new
+	 * {@link HuffmanNode} with symbol {@code symbol} relative to {@code root},
+	 * following the path in {@code code}.
+	 *
+	 * @param root   The root of the tree to insert into.
+	 * @param symbol The symbol to insert.
+	 * @param code   The path relative to {@code root} to insert at.
+	 */
+	private HuffmanNode construct(HuffmanNode root, int symbol, String code,
+			int depth) {
+		if (depth == code.length()) {
+			// frequency doesn't matter; set to 0
+			return new HuffmanNode(symbol, 0);
+		}
+
+		if (root == null) {
+			root = new HuffmanNode(-1, 0);
+		}
+
+		if (code.charAt(depth) == '0') {
+			root.left = construct(root.left, symbol, code, depth + 1);
+		} else {
+			root.right = construct(root.right, symbol, code, depth + 1);
+		}
+
+		return root;
+	}
+
+	/**
 	 * Reconstructs a {@link HuffmanTree2} given a {@link BitInputStream}.
 	 * <p>
 	 * Requires that the input tree is in standard format. I.e., {@code input}
@@ -109,6 +157,39 @@ public class HuffmanTree2 {
 			// recursive case: internal node
 			assign(root.left, codes, trace + "0");
 			assign(root.right, codes, trace + "1");
+		}
+	}
+
+	/**
+	 * Writes the tree to {@code output} in standard format. I.e., each line
+	 * contains a integer symbol code, followed by a line containing that
+	 * symbol's path in the tree.
+	 * <p>
+	 * Requires that {@code root} is not null (satisfied by constructor).
+	 *
+	 * @param output The {@link PrintStream} to write the tree to.
+	 */
+	public void write(PrintStream output) {
+		write(output, overallRoot, "");
+	}
+
+	/**
+	 * Recursive helper method for {@link #write(PrintStream)}. Writes the tree
+	 * to {@code output} in standard format.
+	 * <p>
+	 * Requires that {@code root} is not null.
+	 *
+	 * @param output The {@link PrintStream} to write the tree to.
+	 * @param root   The root of the tree currently being written.
+	 * @param trace  The path from the overall root to {@code root}.
+	 */
+	private void write(PrintStream output, HuffmanNode root, String trace) {
+		if (root.left == null && root.right == null) {
+			output.println(root.symbol);
+			output.println(trace);
+		} else {
+			write(output, root.left, trace + "0");
+			write(output, root.right, trace + "1");
 		}
 	}
 

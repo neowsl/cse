@@ -1,6 +1,19 @@
 import java.util.*;
 import java.io.*;
 
+/**
+ * The {@link HuffmanTree2} class allows for compression and decompression of
+ * files. It has nearly identical behaviour to {@link HuffmanTree}, but includes
+ * methods to allow the code file to be written to the header of the compressed
+ * file instead.
+ *
+ * @author Neal Wang <nealwang@uw.edu>
+ * @assignment 8
+ * @date 2025-12-08
+ * @professor Stuart Reges
+ * @ta XunMei Liu
+ * @section AB
+ */
 public class HuffmanTree2 {
 	/**
 	 * The root of this {@link HuffmanTree2}.

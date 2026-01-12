@@ -100,6 +100,66 @@ class LinkedIntList {
 
 		return res;
 	}
+
+	public void mergeFrom(LinkedIntList other) {
+		if (front == null) {
+			front = other.front;
+		} else if (other.front != null) {
+			ListNode newFront;
+			if (front.data < other.front.data) {
+				newFront = front;
+				front = front.next;
+			} else {
+				newFront = other.front;
+				other.front = other.front.next;
+			}
+			ListNode curr = newFront;
+			while (front != null && other.front != null) {
+				if (front.data < other.front.data) {
+					curr.next = front;
+					front = front.next;
+				} else {
+					curr.next = other.front;
+					other.front = other.front.next;
+				}
+				curr = curr.next;
+			}
+			if (front != null) {
+				curr.next = front;
+			} else {
+				curr.next = other.front;
+			}
+			front = newFront;
+		}
+	}
+
+	public boolean bubble() {
+		if (front == null || front.next == null) {
+			return false;
+		}
+
+		boolean changed = false;
+		if (front.next.data < front.data) {
+			ListNode tmp = front;
+			front = front.next;
+			tmp.next = front.next;
+			front = tmp;
+			changed = true;
+		}
+		ListNode curr = front;
+		while (curr.next.next != null) {
+			if (curr.next.next.data < curr.next.data) {
+				ListNode tmp = curr.next;
+				curr.next = curr.next.next;
+				tmp.next = curr.next.next;
+				curr.next.next = tmp;
+				changed = true;
+			} else {
+				curr = curr.next;
+			}
+		}
+		return changed;
+	}
 }
 
 public class Main {
@@ -111,5 +171,18 @@ public class Main {
 		int res = list.shiftLastOf3();
 		System.out.println(res);
 		System.out.println(list);
+		System.out.println();
+
+		LinkedIntList list1 = new LinkedIntList(new ListNode(-3, new ListNode(0, new ListNode(9, new ListNode(12)))));
+		LinkedIntList list2 = new LinkedIntList(new ListNode(9, new ListNode(9, new ListNode(15))));
+		list1.mergeFrom(list2);
+		System.out.println(list1);
+		System.out.println();
+
+		boolean sorted = false;
+		while (!sorted) {
+			System.out.println(list);
+			sorted = !list.bubble();
+		}
 	}
 }

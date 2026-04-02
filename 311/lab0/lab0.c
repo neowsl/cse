@@ -277,7 +277,7 @@ void part_5() {
   // argument.
   // sizeof(Scores) gives the size of the Scores struct in
   // bytes (which is 16), so sizeof(Scores) * 5 is 80.
-  Scores *class_grades = (Scores *)malloc(sizeof(Scores) * 5);
+  Scores *class_grades = (Scores *)malloc(sizeof(Scores) * 300);
   fill_array((int *)class_grades, 5 * 4);
 
   // Q5: Once we are finished with malloc-ed memory, we
@@ -287,7 +287,7 @@ void part_5() {
   // Valgrind is a tool for analyzing how programs
   // use memory, which is often invaluable for C and
   // C++ programming.
-  free(class_grades);
+  // free(class_grades);
 }
 
 // ---------------------------- //

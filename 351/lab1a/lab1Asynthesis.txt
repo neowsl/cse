@@ -1,22 +1,80 @@
 ******************************
 * Lab 1a Synthesis Questions *
 ******************************
-Name(s):  
-NetID(s): 
+Name(s):  Neal Wang
+NetID(s): nealwang
 
 
 -----------------------------------------------------------
 1) Steps:
 
+Consider pointers `ptr1` and `ptr2` that point to the two addresses, where
+`ptr2` comes after `ptr1`.
 
+Initially, one might attempt to do `ptr2 - ptr1` to calculate the difference
+between the pointers in bytes (this is what I tried as well).
+
+However, pointer arithmetic in C is *scaled* by the size of the underlying data
+type. Since we are trying to find this scale factor, we cannot use this approach
+- it's a Catch-22.
+
+Therefore, one might choose to first cast the pointers to another data type. But
+what do we cast to? I tried casting to an `int`, but found a compiler warning:
+
+```
+-Wpointer-to-int-cast: Cast to smaller integer type 'int' from 'int *'
+```
+
+We learned from lecture that pointers are 8 bytes, but `int`s are only 4 bytes.
+Therefore, we cast to a `long`, which is 8 bytes on a 64-bit Unix system. This
+causes the compiler warning to go away.
+
+Lastly, since we were asked to calculate the difference, we simply subtract
+the casted `ptr1` from `ptr2`.
+
+Here is the code snippet (from the `int_size` example):
+
+```c
+(long)int_ptr2 - (long)int_ptr1
+```
 
 -----------------------------------------------------------
 2) Explain:
 
+`swap_ints` must take two pointers because we need to modify data outside the
+scope of the function. Pointers allow us to directly modify data by editing the
+content at specific addresses of memory *outside* the scope of the function.
 
+We would be able to *locally* swap `int`s if they weren't passed as pointers.
+However, without knowing the external addresses, the changes we make wouldn't
+affect the variables outside of the function, essentially making the function
+useless.
 
 -----------------------------------------------------------
 3) Positive Impact(s) and Drawback/Limitation(s):
 
+My first CS course was actually at WSU through the Running Start program. We
+learned programming through C/C++, and spent the first few weeks discussing
+memory management at a low level. I find this pretty interesting since I've
+taken intro courses in both a "low-level" and a higher-level language.
 
+Drawbacks/Limitations:
+Learning in C felt very "raw" - there were no fancy features, just memory,
+variables, and functions. I enjoyed that because you get to really drill down
+the fundamentals. I think coming into CSE 12x, I had a much better grasp of
+the underlying principles of coding, like how data should be handled in a
+program.
 
+Positive Impacts:
+However, learning in Java also had its benefits. We didn't have to spent 2 whole
+weeks setting up Visual Studio, which is important in a fast-paced quarter
+system. Things also just "worked out of the box" more often, which Edstem helped
+facilitate. Abstracting away low-level concepts freed up time for us to learn
+higher-level topics faster, such as Stacks and Queues / OOP. Java also just has
+a more consistent "coding style" - PascalCase class names, camelCase variable
+names, etc., which isn't really the case in languages like C.
+
+If I were to teach an introductory programming course, I think I'd start in
+Java, and as one of the last units, I would introduce C and memory management
+since that timeline would be easier to follow while also supporting low-level
+learning (which I find really fascinating!)

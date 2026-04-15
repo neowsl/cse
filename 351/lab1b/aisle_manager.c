@@ -116,7 +116,7 @@ unsigned short get_spaces(unsigned long *aisle, int index) {
  * Can assume the index is a valid index (0-3 inclusive).
  */
 unsigned short get_id(unsigned long *aisle, int index) {
-        return get_section(aisle, index) & ID_MASK;
+        return get_section(aisle, index) & ID_MASK >> NUM_SPACES;
 }
 
 /* Given a pointer to an aisle, a section index, and a short representing a new
@@ -128,7 +128,7 @@ unsigned short get_id(unsigned long *aisle, int index) {
 void set_section(unsigned long *aisle, int index, unsigned short new_section) {
         // zero out section bits
         *aisle &= SECTION_MASK << (index * SECTION_SIZE);
-        // set to new section bits
+        // set new section bits
         *aisle |= new_section << (index * SECTION_SIZE);
 }
 
@@ -146,7 +146,7 @@ void set_spaces(unsigned long *aisle, int index, unsigned short new_spaces) {
                 return;
 
         short section = get_section(aisle, index);
-        set_section(aisle, index, section & SPACES_MASK | new_spaces);
+        set_section(aisle, index, (section & SPACES_MASK) | new_spaces);
 }
 
 /* Given a pointer to an aisle, a section index, and a short representing a new
@@ -163,7 +163,7 @@ void set_id(unsigned long *aisle, int index, unsigned short new_id) {
                 return;
 
         short section = get_section(aisle, index);
-        set_section(aisle, index, section & ID_MASK | new_id);
+        set_section(aisle, index, (section & ID_MASK) | new_id);
 }
 
 /* Given a pointer to an aisle, a section index, and a space index, toggle the

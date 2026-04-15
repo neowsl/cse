@@ -79,12 +79,12 @@
 // Mask for extracting the spaces bits from a section.
 // (section & SPACES_MASK) should preserve all the spaces bits in a section and
 // set all non-spaces bits to 0.
-#define SPACES_MASK 0x0CFFF
+#define SPACES_MASK 0x03FF
 
 // Mask for extracting the ID bits from a section.
 // (section & ID_MASK) should preserve all the id bits in a section and set all
 // non-id bits to 0.
-#define ID_MASK ~(SPACES_MASK)
+#define ID_MASK 0xFC00
 
 /* Given a pointer to an aisle and a section index, return the section at the
  * given index of the given aisle.
@@ -103,7 +103,7 @@ unsigned short get_section(unsigned long *aisle, int index) {
  * Can assume the index is a valid index (0-3 inclusive).
  */
 unsigned short get_spaces(unsigned long *aisle, int index) {
-        return get_section(aisle, index) & SECTION_MASK;
+        return get_section(aisle, index) & SPACES_MASK;
 }
 
 /* Given a pointer to an aisle and a section index, return the id of the
@@ -116,8 +116,7 @@ unsigned short get_spaces(unsigned long *aisle, int index) {
  * Can assume the index is a valid index (0-3 inclusive).
  */
 unsigned short get_id(unsigned long *aisle, int index) {
-        // TODO: implement this method
-        return 0;
+        return get_section(aisle, index) & ID_MASK;
 }
 
 /* Given a pointer to an aisle, a section index, and a short representing a new
@@ -127,7 +126,10 @@ unsigned short get_id(unsigned long *aisle, int index) {
  * Can assume the index is a valid index (0-3 inclusive).
  */
 void set_section(unsigned long *aisle, int index, unsigned short new_section) {
-        // TODO: implement this method
+        // zero out section bits
+        *aisle &= SECTION_MASK << (index * SECTION_SIZE);
+        // set to new section bits
+        *aisle |= new_section << (index * SECTION_SIZE);
 }
 
 /* Given a pointer to an aisle, a section index, and a short representing a new
@@ -140,7 +142,11 @@ void set_section(unsigned long *aisle, int index, unsigned short new_section) {
  * Can assume the index is a valid index (0-3 inclusive).
  */
 void set_spaces(unsigned long *aisle, int index, unsigned short new_spaces) {
-        // TODO: implement this method
+        if ((new_spaces & SPACES_MASK) != new_spaces)
+                return;
+
+        short section = get_section(aisle, index);
+        set_section(aisle, index, section & SPACES_MASK | new_spaces);
 }
 
 /* Given a pointer to an aisle, a section index, and a short representing a new
@@ -153,7 +159,11 @@ void set_spaces(unsigned long *aisle, int index, unsigned short new_spaces) {
  * Can assume the index is a valid index (0-3 inclusive).
  */
 void set_id(unsigned long *aisle, int index, unsigned short new_id) {
-        // TODO: implement this method
+        if ((new_id & ID_MASK) != new_id)
+                return;
+
+        short section = get_section(aisle, index);
+        set_section(aisle, index, section & ID_MASK | new_id);
 }
 
 /* Given a pointer to an aisle, a section index, and a space index, toggle the
@@ -165,7 +175,8 @@ void set_id(unsigned long *aisle, int index, unsigned short new_id) {
  * Can assume the spaces index is a valid index (0-9 inclusive).
  */
 void toggle_space(unsigned long *aisle, int index, int space_index) {
-        // TODO: implement this method
+        short section = get_section(aisle, index);
+        set_section(aisle, index, section ^ (1 << space_index));
 }
 
 /* Given a pointer to an aisle and a section index, return the number of items
@@ -174,8 +185,17 @@ void toggle_space(unsigned long *aisle, int index, int space_index) {
  * Can assume the index is a valid index (0-3 inclusive).
  */
 unsigned short num_items(unsigned long *aisle, int index) {
-        // TODO: implement this method
-        return 0;
+        short spaces = get_spaces(aisle, index);
+
+        short res = 0;
+        while (spaces) {
+                if (spaces & 1) {
+                        res++;
+                }
+                spaces >>= 1;
+        }
+
+        return res;
 }
 
 /* Given a pointer to an aisle, a section index, and the desired number of
@@ -188,7 +208,20 @@ unsigned short num_items(unsigned long *aisle, int index) {
  * Can assume the index is a valid index (0-3 inclusive).
  */
 void add_items(unsigned long *aisle, int index, int n) {
-        // TODO: implement this method
+        short spaces = get_spaces(aisle, index);
+
+        for (int i = 0; i < NUM_SPACES && n > 0; i++) {
+                short curr = 1 << i;
+
+                // skip already filled spaces
+                if (spaces & curr)
+                        continue;
+
+                spaces |= curr;
+                n--;
+        }
+
+        set_spaces(aisle, index, spaces);
 }
 
 /* Given a pointer to an aisle, a section index, and the desired number of
@@ -201,7 +234,22 @@ void add_items(unsigned long *aisle, int index, int n) {
  * Can assume the index is a valid index (0-3 inclusive).
  */
 void remove_items(unsigned long *aisle, int index, int n) {
-        // TODO: implement this method
+        // essentially same implementation as `add_items`, except unset using ~
+        short spaces = get_spaces(aisle, index);
+
+        for (int i = 0; i < NUM_SPACES && n > 0; i++) {
+                short curr = 1 << i;
+
+                // skip empty spaces
+                if (!(spaces & curr))
+                        continue;
+
+                // don't edit outside of `SPACES_MASK`
+                spaces &= ~curr & SPACES_MASK;
+                n--;
+        }
+
+        set_spaces(aisle, index, spaces);
 }
 
 /* Given a pointer to an aisle, a section index, and a number of slots to
@@ -215,7 +263,20 @@ void remove_items(unsigned long *aisle, int index, int n) {
  * Can NOT assume n < NUM_SPACES (hint: find an equivalent rotation).
  */
 void rotate_items_left(unsigned long *aisle, int index, int n) {
-        // TODO: implement this method
+        short spaces = get_spaces(aisle, index);
+        // get an extra 16 bits to handle maximum overflow,
+        // where `n = NUM_SPACES - 1`
+        unsigned int spaces_with_overflow = spaces;
+        // handle `n >= NUM_SPACES` case
+        n %= NUM_SPACES;
+
+        spaces_with_overflow <<= n;
+        // mask out least significant bits
+        spaces = spaces_with_overflow & SPACES_MASK;
+        // append the dropped bits
+        spaces |= spaces_with_overflow >> NUM_SPACES;
+
+        set_spaces(aisle, index, spaces);
 }
 
 /* Given a pointer to an aisle, a section index, and a number of slots to
@@ -229,5 +290,7 @@ void rotate_items_left(unsigned long *aisle, int index, int n) {
  * Can NOT assume n < NUM_SPACES (hint: find an equivalent rotation).
  */
 void rotate_items_right(unsigned long *aisle, int index, int n) {
-        // TODO: implement this method
+        // since `spaces` is cyclical, an `n` rotation to the right is identical
+        // to a `NUM_SPACES - n` rotation to the left!
+        rotate_items_left(aisle, index, NUM_SPACES - n);
 }

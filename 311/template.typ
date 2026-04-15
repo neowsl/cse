@@ -52,6 +52,8 @@
   )[
     *#context subq-counter.display("(a)")* #h(1em)
 
+    #set enum(numbering: "i.")
+
     #body
   ]
 }

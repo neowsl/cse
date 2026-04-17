@@ -137,7 +137,7 @@ unsigned short *section_with_most_items() {
                 unsigned long *aisle = aisles + i;
                 for (int j = 0; j < SECTIONS_PER_AISLE; j++) {
                         int num_items_ = num_items(aisle, j);
-                        if (num_items_ < most_items)
+                        if (num_items_ <= most_items)
                                 continue;
 
                         // update best section

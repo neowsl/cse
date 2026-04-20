@@ -1,26 +1,92 @@
 ******************************
 * Lab 1b Synthesis Questions *
 ******************************
-Name(s):  
-NetID(s): 
+Name(s):  Neal Wang
+NetID(s): nealwang
 
 
 -----------------------------------------------------------
-1) Benefit 1:
+1) Benefit 1: Since we now have 8 bits instead of 6 to store the item IDs, we
+              can represent a greater selection of unique items. Furthermore,
+              since the lowest 8 bits actually represent a number (rather than
+              a one-hot encoding), we can store a much greater amount of items
+              per aisle - now up to 2^8 - 1 = 255 rather than only 10.
 
-   Benefit 2:
+   Benefit 2: Adding/Removing items from an aisle becomes much more efficient
+              (and the logic becomes much easier to understand). These can now
+              be simple integer increment or decrement commands rather than
+              entire loops with bit shifting logic.
 
-   Drawback:
+   Drawback:  We can no longer represent the exact location of items; i.e.
+              representing that spaces #3, #4, and #8 are occupied.
 
    Preference & Justification:
 
+   I would opt for my friend's suggestion as we can simply have the option to
+   hold more items per aisle (not physically). The code would also be much
+   easier to write and maintain. Also, since humans have eyes, I doubt any
+   logical person would complain about not knowing whether there is an item in
+   space #3 or #4, especially if they are adjacent to each other. And I haven't
+   seen anyone need to "rotate" an aisle section before :)
+
 -----------------------------------------------------------
-2) Difference? Y/N
+2) Difference? Y
 
    Explain:
+
+   Differences between the values of `y` in the statements arise from the types
+   we choose to. For instance, this code:
+
+   ```c
+   unsigned long y;
+   y = -1;
+   printf("%lu\n", y);
+   y = 0xFFFFFFFF;
+   printf("%lu\n", y);
+   ```
+
+   Produces these results:
+
+   ```
+   18446744073709551615
+   4294967295
+   ```
+
+   Notice that the values of `y` are different. This is because a `long` is 8
+   bytes on a 64-bit Linux system. The second assignment, `y = 0xFFFFFFFF` only
+   sets the 4 least significant bytes to ones, whereas the 4 most significant
+   bytes are default to zeroes (setting `y` to 0x00000000FFFFFFFF. The -1
+   constant causes unsigned underflow, wrapping `y` around to UMax, which
+   happens to be `0xFFFFFFFFFFFFFFFF`. Thus, the two assignments aren't
+   necessarily always the same.
+   However, they can evaluate to equivalent results if the type of `y` is at
+   most 4 bytes (i.e. int, short, or char).
 
 -----------------------------------------------------------
 3) Explain:
 
-   Considerations:
+   We can't use == or != to check equality on floating point numbers because
+   some numbers are not fully accurately representable with IEEE-standard
+   floats, e.g. 0.1, pi, or 2^100 + 1. This is simply because unlike integers,
+   which are discrete, real numbers fall on a continuous number line or infinite
+   points, yet we only have a finite number of bits to store information.
+   Therefore, accuracy loss is always possible, but can be mitigated by
+   evaluating the *difference* between floating point numbers against a
+   threshold.
 
+   Considerations:
+   
+   When picking a threshold value, we should consider the "minimum possible
+   step" given our exponent field. If we change the LSB of a float/double (the
+   rightmost bit), the actual change we make is scaled by the exponent field
+   of the floating point number. If our threshold value was smaller than the
+   minimum possible step, then it becomes useless.
+   Another perspective is that floating-point subtraction is a closed operation
+   under the set of all numbers representable by the given exponent field +
+   bits in the mantissa (shoutout CSE 311). If our chosen threshold value is
+   not a member of the set, any operations with it will result in undefined
+   behavior in a mathematical sense.
+   So, we choose a threshold value with a bit of "wiggle room" in case a few
+   of the least significant bits aren't truly accurate, but we shouldn't choose
+   a threshold value with so much wiggle room that everything starts becoming
+   equal.

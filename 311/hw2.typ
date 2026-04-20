@@ -121,7 +121,7 @@
 ]
 
 #solution[
-  Let $x$, $y$, and $z$ be arbitrary integers. Suppose $x | y$ and $x | z$. By the definition of divides, know $y = n_y x$ and $z = n_z x$ for some integers $n_y$ and $n_z$. Next, $y + z = n_y x + n_z x = (n_y + n_z) x$. Since addition is closed under the integers, and there is an integer $n$ such that $y + z = n x$, we know that $x | (y + z)$ by the definition of divides. Therefore, since $x$, $y$, and $z$ were arbitrary, we can conclude that the claim holds.
+  Let $x$, $y$, and $z$ be arbitrary integers. Suppose $x | y$ and $x | z$. By the definition of divides, know $y = n_y x$ and $z = n_z x$ for some integers $n_y$ and $n_z$. Next, $y + z = n_y x + n_z x = (n_y + n_z) x$. Since addition is closed under the integers, and there is an integer $n = n_y + n_z$ such that $y + z = n x$, we know that $x | (y + z)$ by the definition of divides. Therefore, since $x$, $y$, and $z$ were arbitrary, the claim holds.
 ]
 
 #pagebreak()
@@ -145,9 +145,40 @@
 #solution[
   / 1.: $exists x P(x)$ Given
   / 2.: $forall x R(x, c)$ Given
-  / 3.: $$ Given
+  / 3.: $forall x (P(x) -> R(c, x))$ Given
+  / 4.: $P(n)$ Elim $exists$: 1
+  / 5.: $P(n) -> R(c, n)$ Elim $forall$: 3
+  / 6.: $R(c, n)$ Modus Ponens: 4, 5
+  / 7.: $R(n, c)$ Elim $forall$: 2
+  / 8.: $R(c, n) and R(n, c)$ Intro $and$: 6, 7
+  / 9.: $exists y (R(c, y) and R(y, c))$ Intro $exists$: 8
+  / 10.: $exists x exists y (R(x, y) and R(y, x))$ Intro $exists$: 9
 ]
 
+Continued on next page $->$
+
+#pagebreak()
+
 #solution[
-  / i.: Let $x$ and $y$ be arbitrary integers. Suppose $x$ and $y$ are both odd. By the definition of odd, $x = 2n + 1$ and $y = 2m + 1$ for some integers $n$ and $m$. Then, $x dot y = (2n + 1)(2m + 1) = 4 n m + 2n + 2m + 1 = 2(2 n m + n + m) + 1$. Since addition is closed under the integers, and there is an integer $z$ such that $x dot y = 2z + 1$, $x dot y$ is odd by the definition of odd. Therefore, since $x$ and $y$ were arbitrary, we can conclude that the claim holds.
+  / i.: Let $x$ and $y$ be arbitrary odd integers.\
+    By the definition of odd, $x = 2n + 1$ and $y = 2m + 1$ for some integers $n$ and $m$.\
+    Then, $x dot y = (2n + 1)(2m + 1) = 4 n m + 2n + 2m + 1 = 2(2 n m + n + m) + 1$.\
+    Since addition is closed under the integers, and there is an integer $z = 2 n m + n + m$ such that $x dot y = 2z + 1$, $x dot y$ is odd by the definition of odd.\
+    Therefore, since $x$ and $y$ were arbitrary, the claim holds.
+
+  / ii.: Let $x$ and $y$ be arbitrary rational numbers.\
+    By the definition of rational, $x = a / b$ and $y = c / d$ for some integers $a$, $b$, $c$, and $d$.\
+    Then, $x + y = a / b + c / d = (a d + b c) / (b d)$.\
+    Since addition and multiplication are closed under the integers, and there are two integers $p = a d + b c$ and $q = b d$ such that $x + y = p / q$, $x + y$ is rational by the definition of rational.\
+    Therefore, since $x$ and $y$ were arbitrary, the claim holds.
+
+  / iii.: Let $a$ be an arbitrary positive integer.\
+    We will show that $a$ satisfies the definition of $gcd(a, a)$.\
+    First, we can see that $a = 1a$. Thus, $a | a$ by the definition of divides. It remains to be shown that every positive integer that divides $a$ is no bigger than $a$.\
+    Let $b$ be an arbitrary non-negative integer. Suppose $b | a$. Then by definition of divides, $a = q b$. We continue by cases:\
+    Suppose that $q = 0$. Then $a = 0 b = 0$, which contradicts the first fact that $a$ is a positive integer. Since false is true, anything is true. In particular, we have $b <= a$.\
+    Suppose that $q > 0$. Then $a = q b$, but $a$ cannot be smaller than $b$ by property of integers. Again, $b <= a$.\
+    Since these cases are exhaustive, we have shown that $b <= a$ holds in general.\
+    Since $b$ was arbitrary, we have proven $gcd(a, a) = a$ by the definition of GCD.\
+    Therefore, since $a$ was arbitrary, the claim holds.
 ]

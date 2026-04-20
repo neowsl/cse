@@ -41,6 +41,7 @@
 
 #let solution(width: 100%, body) = {
   subq-counter.step()
+
   block(
     width: width,
     fill: rgb("f6f8ff"),

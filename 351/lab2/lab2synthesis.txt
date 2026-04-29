@@ -1,23 +1,47 @@
 *****************************
 * Lab 2 Synthesis Questions *
 *****************************
-Name(s):  
-NetID(s): 
+Name(s):  Neal Wang
+NetID(s): nealwang
 
 
 -----------------------------------------------------------
-1) &value:  
-   &array:  
+1) &value:  %rbp - 52
+   &array:  %rbp - 48
 -----------------------------------------------------------
-2) Init:   <fillArray+#>
-   Update: <fillArray+#>
+2) Init:   <fill_array+40>
+   Update: <fill_array+146>
 -----------------------------------------------------------
-3) String address: 
-   Part of memory: 
-   Assembly instruction address: <function+#>
+3) String address: 0x4020a2
+   Part of memory: Literals
+   Assembly instruction address: <part_2+8>
 -----------------------------------------------------------
 4) Strategy + example:
+
+For this lab, there were 2 strategies that were really useful for my workflow.
+
+One was to simply step through the assembly with `si`/`ni` until I hit some sort
+of validation structure (like a compare + jump). Then I would examine the
+registers using `x` or `p` to determine what input I needed to defuse the bomb.
+
+Another strategy was to translate the assembly instructions to C code, then
+reason about it at a high level. For instance, this was super useful for the
+recursion task (phase 4). Since the code was short, it was easier to directly
+translate it to C. I would recommend this strategy of reasoning in C to future
+students.
+
+Lastly, `layout split` was a game-changer, as I was constantly retyping `disas`
+to check my location in the assembly. I wish I'd known the command sooner! I
+would highly recommend that command to a future 351 student.
+
 -----------------------------------------------------------
 5) Difficulty + why (past experience):
 -----------------------------------------------------------
 
+I think the most difficult part of assembly is the fact that operations are so
+"unrestricted", e.g. directly referencing memory by a numerical address.
+Assembly is "correct" in the sense that the compiler that generates it is
+well-written, not because the language itself has guardrails. Coming from a
+background of Rust/Haskell, where type and memory safety are built-in language
+constructs, the free-form nature of assembly definitely took some getting used
+to.

@@ -134,3 +134,84 @@
 
   Since $x$ was arbitrary, we have proven, by the definition of set equality, that $(A \\ (B inter C)) = (A \\ B) union (A \\ C)$.
 ]
+
+#pagebreak()
+
+= Optional Practice Problems
+
+#solution[
+  / i.: Let $x$ be an arbitrary element of $A$.
+
+  Then by the definition of subset, ${x} subset A$.
+
+  Then, by the definition of powerset, ${x} in powerset(A)$.
+
+  Since we were given that $powerset(A) subset powerset(B)$, then by the definition of subset, ${x} in powerset(B)$.
+
+  Then, by the definition of powerset, ${x} subset B$.
+
+  Which means that by the definition of subset, $x in B$.
+
+  Therefore, since $x$ was arbitrary, we have proven, by the definition of subset, that $A subset B$.
+
+  / iii.: Let $(a, b)$ be an arbitrary element of $A times B$.
+
+  Then, by the definition of Cartesian product, $a in A$ and $b in B$.
+
+  Since we are given $A subset B$, then by the definition of subset, $a in B$.
+
+  Since $a in B$ and $b in B$, then by the definition of Cartesian product, $(a, b) in B times B$.
+
+  Therefore, since $(a, b)$ was arbitrary, we have proven, by the definition of subset, that $A subset B$.
+]
+
+#solution[
+  / i.: The claim is false.
+
+  Suppose $A = {1}$, $B = {1}$, and $C = emptyset$.
+
+  $A \\ (B inter C) = {1} \\ emptyset = {1}$
+
+  $(A \\ B) inter (A \\ C) = emptyset inter {1} = emptyset$
+
+  Since a counterexample exists, the claim is false.
+
+  / iii.: Let $x$ be an arbitrary element.
+
+  The stated biconditional holds since
+
+  $
+    x in ((A inter overline(A)) union overline(B)) union overline(C) & equiv x in (A inter overline(A) or x in overline(B)) or x in overline(C) & "  Def of " union \
+    & equiv (x in A and x in.not A) or x in overline(B) or x in overline(C) & "  Def of " inter \
+    & equiv F or x in overline(B) or x in overline(C) & "  Contradiction" \
+    & equiv x in overline(B) or x in overline(C) & "  Identity" \
+    & equiv x in (overline(B) union overline(C)) & "  Def of " union \
+    & equiv x in overline(B inter C) & "  DeMorgan's Law" \
+  $
+
+  Therefore, since $x$ was arbitrary, we have proven that $((A inter overline(A)) union overline(B)) union overline(C) = overline(B inter C)$ by the definition of set equality.
+]
+
+#solution[
+  / i.: Claim: Let $P(L)$ be "$"len"("double"(L)) = 2 dot "len"(L)$". We will show that $P(L)$ holds for all Lists $L$ by induction on L.
+
+  Base Case: $"len"("double"("nil")) = "len"("nil") = 0 = 2 dot 0 = 2 dot "len"("nil")$, so $P("nil")$ is true.
+
+  Inductive Hypothesis: Suppose $P(L)$ is true for some arbitrary $L in "List"$.
+
+  Inductive Step:
+
+  $
+    "len"("double"(a :: L)) & = "len"(a :: a :: "double"(L)) & "  Def of double" \
+                            & = 1 + "len"(a :: "double"(L))  &    "  Def of len" \
+                            & = 1 + 1 + "len"("double"(L))   &    "  Def of len" \
+                            & = 2 + "len"("double"(L))       &       "  Algebra" \
+                            & = 2 + 2 dot "len"(L)           &          "  I.H." \
+                            & = 2 dot (1 + "len"(L))         &       "  Algebra" \
+                            & = 2 dot ("len"(a :: L))        &    "  Def of len" \
+  $
+
+  Thus $P(a :: L)$ is true.
+
+  Conclusion: Therefore, we have shown that $P(L)$ is holds for all lists $L$ by induction.
+]

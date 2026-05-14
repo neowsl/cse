@@ -126,7 +126,7 @@ void part_2() {
 
     // Q2.1: What happens if the second argument is greater
     // than the size of the array (10)?
-    fill_array(array, 10);
+    fill_array(array, 15);
 
     int value = 351;
 

@@ -1,26 +1,120 @@
 *****************************
 * Lab 3 Synthesis Questions *
 *****************************
-Name(s):  
-NetID(s): 
+Name(s):  Neal Wang
+NetID(s): nealwang
 
 
 -----------------------------------------------------------
 1) Explain: 
 
+A segmentation fault occurred when I set `len` to be 20
+when calling `fill_array()`. The segmentation fault was
+caused by buffer overflow, where data was written outside
+the boundaries of `array` in the stack, bleeding into and
+overwriting data such as the return address. Note that
+since `array` is allocated inside of `part_2()`'s stack
+frame, the segfault occurs inside of `part_2()`, while the
+actual memory corruption occurs inside of `fill_array()`.
 
+
+The value of the return address of `part_2()` gets
+corrupted/overwritten. This means that when the function
+tries to return, it pops a nonsensical return address off
+the stack and attempts to execute code at a meaningless
+location.
+
+The `ret` instruction at the end of `part_2()`, as
+explained above.
 
 -----------------------------------------------------------
 2) Minimum len to cause a segfault: 
    Step-by-step calculation:
 
+To cause a segfault, we simply need to corrupt at least one
+byte of the return address. Since the return address is
+stored on the stack, we should be wary of any instructions
+that modify `%rsp` (the stack pointer) inside of
+`part_2()`. There is one instruction:
+
+`<part_2+0>: sub $0x48, %rsp`
+
+Next, we need to know where `array` starts so we have a
+baseline of where to begin our buffer overflow. Since
+`array` is the first argument to `fill_array()`, we should
+expect the starting address to be moved into `%rdi`.
+Indeed, we find the following instructions:
+
+`<part_2+14>: lea 0x10(%rsp), %rax`
+`<part_2+24>: mov %rax, %rdi`
+
+The `lea` instruction suggests that `array` starts
+0x10 = 16 bytes above the stack pointer. Since we initially
+subtracted 0x48 = 72 bytes from the stack pointer, adding
+back 16 gives us 56 bytes of data above `array` that we
+must overwrite to reach the return address.
+
+Since we must corrupt the return address, we need to write
+at least 57 bytes into `array`. `array` is an array of
+4-byte ints, so we take `ceil(57 / 4) = 15` to find that we
+need a minimum of `len = 15` to corrupt the return address
+and cause a segfault.
+
+And indeed, setting `len = 14` doesn't segfault, and
+`len = 15` does!
 
 -----------------------------------------------------------
 3) Hacker Reflection:
 
+To me, a "hacker" is someone who uses a tool in a way it
+wasn't intended to be used. Thus, "Level 2: Bang" made me
+feel like a hacker the most. It was when I realised that
+not only can we redirect the control flow of a program, we
+can literally inject our own code to be run in the stack.
+
+This felt like "hacking" to me, not because we were
+maliciously exploiting a system per se, but because we were
+able to work "in the margins" of a system, using the
+mechanical nature of a machine to accomplish something it
+wasn't designed to do. It felt creative/curious because we
+were thinking outside of the box, which is one of the
+primary reasons I'm drawn to security in general - if
+you're an FBI agent, please don't put me on a watchlist :)
 
 -----------------------------------------------------------
 4) Vulnerabilities and Security:
 
+It has made me realise that it is actually very difficult
+to account for these "holes" in security when designing a
+system. It's crazy that C, being an old language, has
+vulnerabilities like this that a freshman CSE student could
+learn to exploit.
+
+There are certainly tradeoffs when designing a system. I
+have a background in Rust, where the borrow checker holds
+your hand in memory management. However, there is still a
+part of the "hackiness" of C that I really enjoy, even if
+there are vulnerabilities. For instance, the Quake fast
+inverse square root algorithm was made in C:
+
+https://en.wikipedia.org/wiki/Fast_inverse_square_root
+
+I occasionally watch videos from channels like Low Level,
+who break down security vulnerabilities. It's cool to be
+able to finally understand some small portion of what they
+discuss now!
+
+Ultimately, I still hold to my view that computer security
+can never prevent truly nefarious actors. There are
+multiple attack vectors, from supply chain attacks to
+social engineering; recall the XZ backdoor (which, like
+"Level 3: Dynamite", patches up its own footprint!):
+
+https://en.wikipedia.org/wiki/XZ_Utils_backdoor
+
+So while we can certainly choose tools that make exploits
+more difficult (e.g. using a memory-safe language), I
+believe it's up to the morality and ethics of the people
+to not exploit security vulnerabilities.
 
 -----------------------------------------------------------

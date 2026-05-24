@@ -37,23 +37,36 @@ NetID(s): nealwang
 
 -----------------------------------------------------------
 2) Where are the loop variables stored in lab0.d:
-   i: 
-   j: 
-   k: 
+   i: -0x14(%rbp)
+   j: -0x18(%rbp)
+   k: -0x1c(%rbp)
 -----------------------------------------------------------
 3) Corresponding values in lab0opt.d:
-   %edx: 
-   %ecx: 
+   %edx: k
+   %ecx: i + j + k
 -----------------------------------------------------------
-4) Effect on number of misses:
+4) Effect on number of misses: Increase
 
-   Explain:
+   Explain: The extra misses occur in the first `l`-loop, when we are loading a
+            block from `A` into our `tmp` array. Since `A` does not start at
+            the beginning of a cache block, we will incur 2 misses, rather than
+            1, per `BLOCK_SIZE` of `A`. I.e. the `l`-loop now traverses across
+            the boundary between two blocks, causing an extra miss.
 
 
 -----------------------------------------------------------
-5) Effect on number of misses:
+5) Effect on number of misses: Decrease
 
-   Explain:
+   Explain: The main problem with the power-of-2 matrix sizes was that we
+            couldn't fully utilise the space in our cache. Since the cache was
+            direct-mapped, operations were frequently "fighting" for the same
+            sets in the cache, leading to many conflict misses.
+            However, with dimensions of 57 and 71, the rows are now
+            - 71 * 4 bytes = 284 bytes
+            - 57 * 4 bytes = 228 bytes
+            These aren't powers of 2, which means a greater fraction of our
+            cache is in use at any slice of time. This means less evictions of
+            useful data, resulting in fewer misses.
 
 
 -----------------------------------------------------------

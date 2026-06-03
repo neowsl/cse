@@ -1,19 +1,58 @@
 *****************************
 * Lab 5 Synthesis Questions *
 *****************************
-Name(s):  
-NetID(s): 
+Name(s):  Neal Wang
+NetID(s): nealwang
 
 
 -----------------------------------------------------------
-1) Boundary Tag Size:  
+1) Boundary Tag Size: 8 bytes
    Reasoning:
 
+I updated the code in `part_5` to this:
 
+```
+int MALLOC_BYTES = 16;
+void *p = malloc(MALLOC_BYTES);
+printf("malloc(%i) address: %p\n", MALLOC_BYTES, p);
+Scores *class_grades = (Scores *)malloc(sizeof(Scores) * 5);
+printf("class_grades address: %p\n", class_grades);
+printf("difference (bytes): %li\n", (char *)class_grades - (char *)p);
+```
+
+First, when trying different values of `MALLOC_BYTES`, I kept getting
+address differences of multiples of 16. This implies that `malloc` uses 16-byte
+alignment.
+
+Next, with `MALLOC_BYTES = 0`, the difference in addresses is 32, meaning the
+minimum block size is 32 bytes.
+
+Finally, `MALLOC_BYTES = 24` gives a difference of 32, while
+`MALLOC_BYTES = 25` gives a difference of 48. Since 25 causes a "jump" in the
+alignment, we know that 24 bytes fully fills the payload of a block.
+
+This means that in an allocated block, the header takes up 32 - 24 = 8 bytes.
 
 -----------------------------------------------------------
 2) Example or explanation of lack of benefit
 
+I loved that because accessing fields in internal allocator structs is just
+pointer arithmetic, I can just cast a `void *` pointer to a pointer to a
+`block_info` struct, and everything just works.
 
+I started thinking of structs less like objects/classes and more like "windows"
+into memory. Just like how a window has panes or dividers, interfaces divide up
+a chunk of memory by assigning labels to offsets (`size_and_tags`, `next`,
+etc.) I now understand why "views" are named that way in programming!
+
+As for an implementation detail example, I learned that `malloc` requires more
+bytes of data than the payload size, whether to meet the minimum block size
+and/or to store header tags. Users should keep this in mind when using `malloc`
+repeatedly.
+
+For instance, rather than calling `malloc` N times to allocate N slots of
+memory, users could instead call `malloc` once and allocate enough space for
+all N elements. This would reduce the amount of memory wasted by header tag
+overhead.
 
 -----------------------------------------------------------

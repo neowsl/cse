@@ -352,12 +352,6 @@ int mm_init() {
  * returns NULL.
  */
 void *mm_malloc(size_t size) {
-        size_t req_size;
-        block_info *ptr_free_block = NULL;
-        size_t block_size;
-        size_t preceding_block_use_tag;
-        block_info *ptr_split_block = NULL;
-
         // Zero-size requests get NULL.
         if (size == 0) {
                 return NULL;
@@ -366,6 +360,7 @@ void *mm_malloc(size_t size) {
         // Add one word for the initial size header.
         // Note that we don't need a footer when the block is used/allocated!
         size += WORD_SIZE;
+        size_t req_size;
         if (size <= MIN_BLOCK_SIZE) {
                 // Make sure we allocate enough space for the minimum block
                 // size.
@@ -376,7 +371,7 @@ void *mm_malloc(size_t size) {
         }
 
         // get pointer to next free block, expanding heap if needed
-        ptr_free_block = search_free_list(req_size);
+        block_info *ptr_free_block = search_free_list(req_size);
         if (ptr_free_block == NULL) {
                 request_more_space(req_size);
                 ptr_free_block = search_free_list(req_size);
@@ -385,31 +380,36 @@ void *mm_malloc(size_t size) {
         remove_free_block(ptr_free_block);
 
         // size of found free block (may be larger than `req_size`)
-        block_size = SIZE(ptr_free_block->size_and_tags);
+        size_t block_size = SIZE(ptr_free_block->size_and_tags);
 
         if (block_size - req_size >= MIN_BLOCK_SIZE) {
                 // if enough space for another block, split current block
-                ptr_split_block =
+                block_info *ptr_split_block =
                     UNSCALED_POINTER_ADD(ptr_free_block, req_size);
 
                 // set header and footer
                 ptr_split_block->size_and_tags =
                     (block_size - req_size) | TAG_PRECEDING_USED;
 
-                *(size_t *)UNSCALED_POINTER_ADD(ptr_free_block,
-                                                block_size - WORD_SIZE) =
-                    ptr_split_block->size_and_tags;
+                size_t *ptr_split_block_footer = (size_t *)UNSCALED_POINTER_SUB(
+                    ptr_free_block->next, WORD_SIZE);
+
+                *ptr_split_block_footer = ptr_split_block->size_and_tags;
 
                 // immediately coalesce to adjacent free block
+                insert_free_block(ptr_split_block);
                 coalesce_free_block(ptr_split_block);
 
                 block_size = req_size;
+        } else {
+                // no split, simply set following block's `PRECEDING_USED` tag
+                ptr_free_block->next->size_and_tags |= TAG_PRECEDING_USED;
         }
 
         // get the previous block, get its tags, and if it's used, left shift
         // by 1 to move it into correct position
-        preceding_block_use_tag =
-            ptr_free_block->prev->size_and_tags & TAG_USED << 1;
+        size_t preceding_block_use_tag =
+            ptr_free_block->size_and_tags & TAG_PRECEDING_USED;
 
         // update header of newly allocated block accordingly
         ptr_free_block->size_and_tags =
@@ -421,13 +421,20 @@ void *mm_malloc(size_t size) {
 
 /* Free the block referenced by ptr. */
 void mm_free(void *ptr) {
-        size_t payload_size;
-        block_info *block_to_free;
-        block_info *following_block;
-
         // move pointer to start of block (by subtracting header size)
-        block_to_free = UNSCALED_POINTER_SUB(ptr, WORD_SIZE);
+        block_info *block_to_free = UNSCALED_POINTER_SUB(ptr, WORD_SIZE);
+        size_t block_size = SIZE(block_to_free->size_and_tags);
 
+        block_info *following_block =
+            (block_info *)UNSCALED_POINTER_ADD(block_to_free, block_size);
+        size_t *block_footer =
+            (size_t *)UNSCALED_POINTER_SUB(following_block, WORD_SIZE);
+
+        // update header and footer
+        block_to_free->size_and_tags &= ~(TAG_USED);
+        *block_footer = block_to_free->size_and_tags;
+
+        insert_free_block(block_to_free);
         coalesce_free_block(block_to_free);
 }
 

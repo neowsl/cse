@@ -348,6 +348,20 @@ int mm_init() {
 // TOP-LEVEL ALLOCATOR INTERFACE ------------------------------------
 
 /*
+ * If `block` is a free block, updates its footer to match its header
+ * Does nothing if `block` is an allocated block.
+ */
+void sync_footer(block_info *block) {
+        if (block->size_and_tags & TAG_USED)
+                return;
+
+        size_t block_size = SIZE(block->size_and_tags);
+        size_t *footer =
+            (size_t *)UNSCALED_POINTER_ADD(block, block_size - WORD_SIZE);
+        *footer = block->size_and_tags;
+}
+
+/*
  * Allocate a block of size size and return a pointer to it. If size is zero,
  * returns NULL.
  */
@@ -390,14 +404,10 @@ void *mm_malloc(size_t size) {
 
                 // set header and footer
                 ptr_split_block->size_and_tags =
-                    (block_size - req_size) | TAG_PRECEDING_USED;
+                    split_block_size | TAG_PRECEDING_USED;
+                sync_footer(ptr_split_block);
 
-                size_t *ptr_split_block_footer = (size_t *)UNSCALED_POINTER_ADD(
-                    ptr_split_block, split_block_size - WORD_SIZE);
-
-                *ptr_split_block_footer = ptr_split_block->size_and_tags;
-
-                // immediately coalesce to adjacent free block
+                // insert split block into free list, then immediately coalesce
                 insert_free_block(ptr_split_block);
                 coalesce_free_block(ptr_split_block);
 
@@ -409,14 +419,13 @@ void *mm_malloc(size_t size) {
 
                 // no split, simply set following block's `PRECEDING_USED` tag
                 ptr_following_block->size_and_tags |= TAG_PRECEDING_USED;
+                sync_footer(ptr_following_block);
         }
 
-        // get the previous block, get its tags, and if it's used, left shift
-        // by 1 to move it into correct position
         size_t preceding_block_use_tag =
             ptr_free_block->size_and_tags & TAG_PRECEDING_USED;
 
-        // update header of newly allocated block accordingly
+        // update header of newly allocated block
         ptr_free_block->size_and_tags =
             block_size | preceding_block_use_tag | TAG_USED;
 
@@ -428,17 +437,20 @@ void *mm_malloc(size_t size) {
 void mm_free(void *ptr) {
         // move pointer to start of block (by subtracting header size)
         block_info *block_to_free = UNSCALED_POINTER_SUB(ptr, WORD_SIZE);
-        size_t block_size = SIZE(block_to_free->size_and_tags);
-
-        block_info *following_block =
-            (block_info *)UNSCALED_POINTER_ADD(block_to_free, block_size);
-        size_t *block_footer =
-            (size_t *)UNSCALED_POINTER_SUB(following_block, WORD_SIZE);
 
         // update header and footer
         block_to_free->size_and_tags &= ~(TAG_USED);
-        *block_footer = block_to_free->size_and_tags;
+        sync_footer(block_to_free);
 
+        size_t block_size = SIZE(block_to_free->size_and_tags);
+        block_info *following_block =
+            (block_info *)UNSCALED_POINTER_ADD(block_to_free, block_size);
+
+        // also need to unset following block's `PRECEDING_USED` tag
+        following_block->size_and_tags &= ~(TAG_PRECEDING_USED);
+        sync_footer(following_block);
+
+        // insert now freed block into free list, then immediately coalesce
         insert_free_block(block_to_free);
         coalesce_free_block(block_to_free);
 }

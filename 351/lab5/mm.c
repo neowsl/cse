@@ -386,7 +386,7 @@ void *mm_malloc(size_t size) {
                 // if enough space for another block, split current block
                 block_info *ptr_split_block =
                     UNSCALED_POINTER_ADD(ptr_free_block, req_size);
-                size_t split_block_size = SIZE(ptr_split_block->size_and_tags);
+                size_t split_block_size = block_size - req_size;
 
                 // set header and footer
                 ptr_split_block->size_and_tags =
@@ -403,8 +403,12 @@ void *mm_malloc(size_t size) {
 
                 block_size = req_size;
         } else {
+                block_info *ptr_following_block =
+                    (block_info *)UNSCALED_POINTER_ADD(ptr_free_block,
+                                                       block_size);
+
                 // no split, simply set following block's `PRECEDING_USED` tag
-                ptr_free_block->next->size_and_tags |= TAG_PRECEDING_USED;
+                ptr_following_block->size_and_tags |= TAG_PRECEDING_USED;
         }
 
         // get the previous block, get its tags, and if it's used, left shift
@@ -443,8 +447,4 @@ void mm_free(void *ptr) {
  * A heap consistency checker. Optional, but recommended to help you debug
  * potential issues with your allocator.
  */
-int mm_check() {
-        examine_heap();
-
-        return 0;
-}
+int mm_check() { return 0; }

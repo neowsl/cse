@@ -351,7 +351,7 @@ int mm_init() {
  * If `block` is a free block, updates its footer to match its header
  * Does nothing if `block` is an allocated block.
  */
-void sync_footer(block_info *block) {
+static inline void sync_footer(block_info *block) {
         if (block->size_and_tags & TAG_USED)
                 return;
 
@@ -409,7 +409,13 @@ void *mm_malloc(size_t size) {
 
                 // insert split block into free list, then immediately coalesce
                 insert_free_block(ptr_split_block);
-                coalesce_free_block(ptr_split_block);
+
+                // no need to coalesce here! because:
+                // - preceding block (`ptr_free_block`) is going to be
+                //   allocated
+                // - following block can't be free because `ptr_free_block` was
+                //   free; otherwise there would be 2 adjacent free blocks,
+                //   which breaks the allocator's invariance
 
                 block_size = req_size;
         } else {

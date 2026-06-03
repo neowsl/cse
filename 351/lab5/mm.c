@@ -386,13 +386,14 @@ void *mm_malloc(size_t size) {
                 // if enough space for another block, split current block
                 block_info *ptr_split_block =
                     UNSCALED_POINTER_ADD(ptr_free_block, req_size);
+                size_t split_block_size = SIZE(ptr_split_block->size_and_tags);
 
                 // set header and footer
                 ptr_split_block->size_and_tags =
                     (block_size - req_size) | TAG_PRECEDING_USED;
 
-                size_t *ptr_split_block_footer = (size_t *)UNSCALED_POINTER_SUB(
-                    ptr_free_block->next, WORD_SIZE);
+                size_t *ptr_split_block_footer = (size_t *)UNSCALED_POINTER_ADD(
+                    ptr_split_block, split_block_size - WORD_SIZE);
 
                 *ptr_split_block_footer = ptr_split_block->size_and_tags;
 
@@ -443,6 +444,7 @@ void mm_free(void *ptr) {
  * potential issues with your allocator.
  */
 int mm_check() {
-        // TODO: Implement a heap consistency checker as needed/desired.
+        examine_heap();
+
         return 0;
 }
